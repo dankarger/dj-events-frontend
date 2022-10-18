@@ -64,3 +64,11 @@ h1 {
 .btn-icon svg {
   margin-right: 5px;
 }
+.error {
+  text-align: center;
+  margin: 100px 0 200px;
+}
+
+.error h1 {
+  font-size: 50px;
+}
