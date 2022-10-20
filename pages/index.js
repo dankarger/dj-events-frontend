@@ -21,11 +21,14 @@ export default function Home({events}) {
 }
 
 export async function getStaticProps() {
-    const res = await fetch(`${API_URL}/api/events`);
-    const events = await res.json();
+    const res = await fetch(`${API_URL}/api/events?populate=*&_sort=date:ASC&_limit=3`);
+    const jsonEvents = await res.json()
+    const events = jsonEvents.data;
 
+    console.log('e',events)
+    console.log(API_URL)
     return {
-        props: { events:events.slice(0,3) },
+        props: { events:events  },
         revalidate: 1
     }
 }
