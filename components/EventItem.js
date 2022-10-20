@@ -3,7 +3,7 @@ import Image from 'next/image'
 import styles from '@/styles/EventItem.module.css'
 
 export default function EventItem({evt}) {
-    console.log('eve',evt)
+    // console.log('eve',evt)
     const {attributes} = evt
     return (
         <div className={styles.event}>
