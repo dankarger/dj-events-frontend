@@ -1,13 +1,19 @@
 import Layout from "@/components/Layout";
 import {API_URL} from "@/config/index";
 import EventItem from "@/components/EventItem";
+import {useRouter} from "next/router";
+import Link from 'next/link'
 import qs from 'qs';
 
 export default function SearchPage({events}) {
-    console.log('evev',events)
+    const router = useRouter();
+
     return (
-        <Layout>
-            <h1>Events</h1>
+        <Layout title={'Search Result'}>
+            <Link href={'/events'}>
+                <a>Go Back</a>
+            </Link>
+            <h1>Search Results for {router.query.term}</h1>
             {events.length === 0 && <h3>No Event to show</h3>}
             {events.map(evt => (
                 <EventItem key={evt.id} evt={evt}/>
