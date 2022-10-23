@@ -11,8 +11,7 @@ export default function EventItem({evt}) {
 
                 <Image
                     src={
-                        attributes.image.data
-                            ? attributes.image.data.attributes.formats.thumbnail.url
+                        attributes.image.data ? attributes.image.data.attributes.formats.thumbnail.url
                             : "/images/event-default.png"
                     }
                     width="170"
