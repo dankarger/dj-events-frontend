@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import {useState} from "react";
 import {useRouter} from "next/router";
 import Link from 'next/link'
+import Image from 'next/image'
 import {API_URL} from "@/config/index";
 import styles from '@/styles/Form.module.css'
 import {formatDateForInput} from "@/utils/formateDate";
@@ -19,6 +20,7 @@ export default function EditEventPage( { evt, currentId} ) {
         time: evt.time,
         description: evt.description
     })
+    const [imagePreview, setImagePreview] = useState(evt.image.data.attributes.formats.thumbnail.url ? evt.image.data.attributes.formats.thumbnail.url : null)
 
     const router = useRouter()
 
@@ -99,6 +101,12 @@ export default function EditEventPage( { evt, currentId} ) {
                 ></textarea>
                 <input type="submit" value='Edit Event' className='btn'/>
             </form>
+            <h2>Event Image</h2>
+            {imagePreview ? (
+                <Image src={imagePreview} height={100} width={170}/>
+            ) : <div>
+                <p>No Image uploaded</p>
+            </div> }
         </Layout>
     )
 }
@@ -108,7 +116,7 @@ export async function getServerSideProps( {params: {id}} ) {
     const jsonData = await res.json();
     const currentId = jsonData.data.id
     const evt = jsonData.data.attributes
-    console.log('evt2',evt)
+    console.log('111',evt.image.data.attributes.formats.thumbnail.url)
     return {
         props: {
             evt,
