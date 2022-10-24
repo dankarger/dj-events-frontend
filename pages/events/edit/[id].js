@@ -1,6 +1,8 @@
-import { ToastContainer, toast } from 'react-toastify';
+import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {FaImage} from "react-icons/fa";
 import Layout from "@/components/Layout";
+import Modal from "@/components/Modal";
 import {useState} from "react";
 import {useRouter} from "next/router";
 import Link from 'next/link'
@@ -10,56 +12,56 @@ import styles from '@/styles/Form.module.css'
 import {formatDateForInput} from "@/utils/formateDate";
 
 
-export default function EditEventPage( { evt, currentId} ) {
+export default function EditEventPage({evt, currentId}) {
     const [values, setValues] = useState({
         name: evt.name,
         performers: evt.performers,
         venue: evt.venue,
         address: evt.address,
-        date:formatDateForInput(evt.date),
+        date: formatDateForInput(evt.date),
         time: evt.time,
         description: evt.description
     })
     const [imagePreview, setImagePreview] = useState(evt.image.data.attributes.formats.thumbnail.url ? evt.image.data.attributes.formats.thumbnail.url : null)
-
+    const [showModal, setShowModal] = useState(false)
     const router = useRouter()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         //Validation
-        const hasEmptyFields = Object.values(values).some((element) => element=== '')
-        if(hasEmptyFields) {
+        const hasEmptyFields = Object.values(values).some((element) => element === '')
+        if (hasEmptyFields) {
             toast.error('please fill all fields')
         }
-        console.log('eeeee',evt)
+        console.log('eeeee', evt)
         const res = await fetch(`${API_URL}/api/events/${currentId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ data: values }),
+            body: JSON.stringify({data: values}),
         })
 
-        if(!res.ok) {
+        if (!res.ok) {
             toast.error('Something went wrong')
-        }else {
+        } else {
             const evt = await res.json()
             const json = evt.data
-            console.log('res',json)
+            console.log('res', json)
             await router.push(`/events/${json.attributes.slug}`)
         }
 
     }
     const handleInputChane = (e) => {
-        const {name, value } = e.target
+        const {name, value} = e.target
         setValues({...values, [name]: value})
     }
     return (
         <Layout title='Add Event'>
-            <Link href={'/events'} >Go Back</Link>
+            <Link href={'/events'}>Go Back</Link>
             <h1>Edit Event </h1>
             <ToastContainer/>
-            <form onSubmit={handleSubmit} className={styles.form} >
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.grid}>
                     <div>
                         <label htmlFor="name">Event Name</label>
@@ -106,17 +108,29 @@ export default function EditEventPage( { evt, currentId} ) {
                 <Image src={imagePreview} height={100} width={170}/>
             ) : <div>
                 <p>No Image uploaded</p>
-            </div> }
+
+            </div>}
+            <div>
+                <button className='btn-secondary' onClick={()=> setShowModal(true)}>
+                    <FaImage />Set Image
+                </button>
+            </div>
+            <Modal show={showModal}
+                   onClose={()=>setShowModal(false)}
+
+            >
+                Image Uplaod
+            </Modal>
         </Layout>
     )
 }
 
-export async function getServerSideProps( {params: {id}} ) {
+export async function getServerSideProps({params: {id}}) {
     const res = await fetch(`${API_URL}/api/events/${id}?populate=*`)
     const jsonData = await res.json();
     const currentId = jsonData.data.id
     const evt = jsonData.data.attributes
-    console.log('111',evt.image.data.attributes.formats.thumbnail.url)
+    console.log('111', evt.image.data.attributes.formats.thumbnail.url)
     return {
         props: {
             evt,
