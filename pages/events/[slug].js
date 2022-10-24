@@ -1,3 +1,5 @@
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import React from "react";
 import Layout from "@/components/Layout";
 import { API_URL } from "@/config/index";
@@ -5,11 +7,24 @@ import styles from "@/styles/Event.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import { FaPencilAlt, FaTimes } from "react-icons/fa";
+import {useRouter} from "next/router";
 
 export default function EventPage({ evt }) {
+    const router = useRouter()
 
-    const deleteEvent = () => {
-        console.log("delete");
+    const deleteEvent = async () => {
+      if(confirm('Are you sure?')) {
+          const res = await fetch(`${API_URL}/api/events/${evt.id}`, {
+              method: 'DELETE'
+          })
+          const json = await  res.json()
+          const data  = res.data
+          if(!res.ok){
+              toast.error(data.message)
+          }else {
+            await  router.push('/events')
+          }
+      }
     };
 
     console.log(evt);
@@ -35,6 +50,7 @@ export default function EventPage({ evt }) {
                         {attributes.time}
           </span>
                     <h1>{attributes.name}</h1>
+                    <ToastContainer />
                     {/* {evt.image && ( */}
                     <div className={styles.image}>
                         <Image
@@ -103,7 +119,7 @@ export async function getStaticProps({params: { slug }}) {
     }
 }
 // export async function getServerSideProps({ query: { slug } }) {
-//   const res = await fetch(`${API_URL}/api/events/${slug}`);
+//   const res = await fetch(`${API_URL}/api/events/${slug}?populate=*`);
 //   const events = await res.json();
 //   return {
 //     props: { evt: events[0] },
