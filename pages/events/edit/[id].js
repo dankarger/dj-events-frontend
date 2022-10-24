@@ -6,15 +6,16 @@ import {useRouter} from "next/router";
 import Link from 'next/link'
 import {API_URL} from "@/config/index";
 import styles from '@/styles/Form.module.css'
+import {formatDateForInput} from "@/utils/formateDate";
 
 
-export default function EditEventPage( { evt} ) {
+export default function EditEventPage( { evt, currentId} ) {
     const [values, setValues] = useState({
         name: evt.name,
         performers: evt.performers,
         venue: evt.venue,
         address: evt.address,
-        date:evt.date,
+        date:formatDateForInput(evt.date),
         time: evt.time,
         description: evt.description
     })
@@ -28,8 +29,9 @@ export default function EditEventPage( { evt} ) {
         if(hasEmptyFields) {
             toast.error('please fill all fields')
         }
-        const res = await fetch(`${API_URL}/api/events`, {
-            method: 'POST',
+        console.log('eeeee',evt)
+        const res = await fetch(`${API_URL}/api/events/${currentId}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -104,11 +106,13 @@ export default function EditEventPage( { evt} ) {
 export async function getServerSideProps( {params: {id}} ) {
     const res = await fetch(`${API_URL}/api/events/${id}?populate=*`)
     const jsonData = await res.json();
+    const currentId = jsonData.data.id
     const evt = jsonData.data.attributes
     console.log('evt2',evt)
     return {
         props: {
-            evt
+            evt,
+            currentId
         }
     }
 }
