@@ -3,6 +3,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {FaImage} from "react-icons/fa";
 import Layout from "@/components/Layout";
 import Modal from "@/components/Modal";
+import ImageUpload from "@/components/ImageUpload";
 import {useState} from "react";
 import {useRouter} from "next/router";
 import Link from 'next/link'
@@ -22,7 +23,7 @@ export default function EditEventPage({evt, currentId}) {
         time: evt.time,
         description: evt.description
     })
-    const [imagePreview, setImagePreview] = useState(evt.image.data.attributes.formats.thumbnail.url ? evt.image.data.attributes.formats.thumbnail.url : null)
+    const [imagePreview, setImagePreview] = useState(evt.image?.data?.attributes?.formats?.thumbnail?.url ? evt.image.data.attributes.formats.thumbnail.url : null)
     const [showModal, setShowModal] = useState(false)
     const router = useRouter()
 
@@ -55,6 +56,15 @@ export default function EditEventPage({evt, currentId}) {
     const handleInputChane = (e) => {
         const {name, value} = e.target
         setValues({...values, [name]: value})
+    }
+
+    const imageUploaded = async (e) => {
+        console.log('uploaded')
+        const res = await fetch(`${API_URL}/api/events/${currentId}?populate=*`)
+        const data = await res.json()
+        console.log('uploaded222222', data)
+
+        await setImagePreview(data.data.attributes.image.data.attributes.formats.thumbnail.url)
     }
     return (
         <Layout title='Add Event'>
@@ -119,7 +129,7 @@ export default function EditEventPage({evt, currentId}) {
                    onClose={()=>setShowModal(false)}
 
             >
-                Image Uplaod
+                <ImageUpload evtId={currentId} imageUploaded={imageUploaded}/>
             </Modal>
         </Layout>
     )
@@ -130,7 +140,7 @@ export async function getServerSideProps({params: {id}}) {
     const jsonData = await res.json();
     const currentId = jsonData.data.id
     const evt = jsonData.data.attributes
-    console.log('111', evt.image.data.attributes.formats.thumbnail.url)
+    // console.log('111', evt.image.data.attributes.formats.thumbnail.url)
     return {
         props: {
             evt,
