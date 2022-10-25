@@ -2,6 +2,7 @@ import {FaUser} from 'react-icons/fa'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useEffect, useContext, useState} from "react";
+import AuthContext from "@/context/AuthContex";
 import Link from 'next/link'
 import Layout from "@/components/Layout";
 import styles from '@/styles/AuthForm.module.css'
@@ -12,13 +13,14 @@ export default function RegisterPage() {
     const [ password, setPassword] = useState('')
     const [ confirmPassword, setConfirmPassword] = useState('')
 
+    const {register, error} = useContext(AuthContext)
     const handleSubmit=(e)=>{
         e.preventDefault()
         if(password!== confirmPassword) {
             toast.error("Passwords don't match")
             return
         }
-        console.log(username, email,password)
+        register({username, email, password})
     }
 
     return (
