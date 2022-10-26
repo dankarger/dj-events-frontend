@@ -135,12 +135,13 @@ export default function EditEventPage({evt, currentId}) {
     )
 }
 
-export async function getServerSideProps({params: {id}}) {
+export async function getServerSideProps({params: {id},req}) {
     const res = await fetch(`${API_URL}/api/events/${id}?populate=*`)
     const jsonData = await res.json();
     const currentId = jsonData.data.id
     const evt = jsonData.data.attributes
     // console.log('111', evt.image.data.attributes.formats.thumbnail.url)
+    console.log('header',req.headers.cookie)
     return {
         props: {
             evt,
