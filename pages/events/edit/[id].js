@@ -1,6 +1,7 @@
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {FaImage} from "react-icons/fa";
+import {parseCookie} from "@/helpers/parseCookie";
 import Layout from "@/components/Layout";
 import Modal from "@/components/Modal";
 import ImageUpload from "@/components/ImageUpload";
@@ -13,7 +14,7 @@ import styles from '@/styles/Form.module.css'
 import {formatDateForInput} from "@/utils/formateDate";
 
 
-export default function EditEventPage({evt, currentId}) {
+export default function EditEventPage({evt, currentId, token}) {
     const [values, setValues] = useState({
         name: evt.name,
         performers: evt.performers,
@@ -39,11 +40,16 @@ export default function EditEventPage({evt, currentId}) {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token} `
             },
             body: JSON.stringify({data: values}),
         })
 
         if (!res.ok) {
+            if(res.status===402 || res.status===401){
+                toast.error('Unauthorazied')
+
+            }
             toast.error('Something went wrong')
         } else {
             const evt = await res.json()
@@ -136,16 +142,18 @@ export default function EditEventPage({evt, currentId}) {
 }
 
 export async function getServerSideProps({params: {id},req}) {
+    const {token} = parseCookie(req)
     const res = await fetch(`${API_URL}/api/events/${id}?populate=*`)
     const jsonData = await res.json();
     const currentId = jsonData.data.id
     const evt = jsonData.data.attributes
     // console.log('111', evt.image.data.attributes.formats.thumbnail.url)
-    console.log('header',req.headers.cookie)
+
     return {
         props: {
             evt,
-            currentId
+            currentId,
+            token
         }
     }
 }
